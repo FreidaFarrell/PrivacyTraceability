@@ -1,0 +1,15 @@
+{
+  "name": "privacy-traceability-system",
+  "version": "1.0.0",
+  "description": "Privacy Traceability System with FHE encryption",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 8080 -c-1",
+    "dev": "npx http-server . -p 3000 -c-1"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": ["blockchain", "ethereum", "fhe", "traceability", "privacy"],
+  "author": "",
+  "license": "MIT"
+}
