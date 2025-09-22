@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Traceability System</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Privacy Traceability System</h1>
+            <p>Secure product tracking with FHE encryption</p>
+        </header>
+
+        <div class="wallet-section">
+            <button id="connectWallet" class="btn btn-primary">Connect Wallet</button>
+            <div id="walletInfo" class="wallet-info" style="display: none;">
+                <p><strong>Connected:</strong> <span id="walletAddress"></span></p>
+                <p><strong>Network:</strong> <span id="networkName"></span></p>
+            </div>
+        </div>
+
+        <div class="contract-section">
+            <div class="contract-config">
+                <h3>Contract Configuration</h3>
+                <input type="text" id="contractAddress" placeholder="Contract Address" value="0x636449ad5E280e88BB7178985259c91628472c5f" class="input-field">
+                <button id="loadContract" class="btn btn-secondary">Load Contract</button>
+                <div id="contractStatus" class="status-info"></div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="section">
+                <h2>Add Product</h2>
+                <div class="form-group">
+                    <input type="text" id="productId" placeholder="Product ID" class="input-field">
+                    <input type="text" id="productName" placeholder="Product Name" class="input-field">
+                    <input type="text" id="manufacturer" placeholder="Manufacturer" class="input-field">
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="isAuthentic">
+                            <span class="checkmark"></span>
+                            Product is Authentic
+                        </label>
+                    </div>
+                    <button id="addProduct" class="btn btn-primary">Add Product</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Verify Product</h2>
+                <div class="form-group">
+                    <input type="text" id="verifyProductId" placeholder="Product ID to Verify" class="input-field">
+                    <button id="verifyProduct" class="btn btn-secondary">Verify Product</button>
+                    <button id="getProduct" class="btn btn-secondary">Get Product Info</button>
+                </div>
+                <div id="verificationResult" class="result-box"></div>
+            </div>
+
+            <div class="section">
+                <h2>Product List</h2>
+                <button id="loadProducts" class="btn btn-secondary">Load All Products</button>
+                <div id="productList" class="product-list"></div>
+            </div>
+
+            <div class="section">
+                <h2>Manufacturer Management</h2>
+                <div class="form-group">
+                    <input type="text" id="manufacturerAddress" placeholder="Manufacturer Address" class="input-field">
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="authorizeManufacturer">
+                            <span class="checkmark"></span>
+                            Authorize Manufacturer
+                        </label>
+                    </div>
+                    <button id="setAuthorization" class="btn btn-primary">Set Authorization</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Contract Controls</h2>
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="pauseContract">
+                            <span class="checkmark"></span>
+                            Pause Contract
+                        </label>
+                    </div>
+                    <button id="pauseBtn" class="btn btn-warning">Update Pause Status</button>
+                    <input type="text" id="newOwner" placeholder="New Owner Address" class="input-field">
+                    <button id="transferOwnership" class="btn btn-warning">Transfer Ownership</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="transactionStatus" class="transaction-status"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
