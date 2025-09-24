@@ -3,103 +3,420 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Traceability System</title>
-    <link rel="stylesheet" href="./style.css">
+    <meta name="description" content="Secure product tracking with encrypted data protection using blockchain technology">
+    <meta name="keywords" content="blockchain, product traceability, privacy, supply chain, ethereum, smart contract">
+    <meta name="author" content="Privacy Traceability System">
+    <title>Privacy Product Traceability System</title>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .wallet-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .section {
+            background: white;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .section-content {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .product-info {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .trace-record {
+            background: #f0f8e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #28a745;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .section-content {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Privacy Traceability System</h1>
-            <p>Secure product tracking with FHE encryption</p>
-        </header>
+        <div class="header">
+            <h1>🔒 Privacy Product Traceability</h1>
+            <p>Secure product tracking with encrypted data protection</p>
+        </div>
 
         <div class="wallet-section">
-            <button id="connectWallet" class="btn btn-primary">Connect Wallet</button>
-            <div id="walletInfo" class="wallet-info" style="display: none;">
+            <h2>Connect Your Wallet</h2>
+            <div id="walletStatus" class="status info">Please connect your wallet to continue</div>
+            <button id="connectWallet" class="btn">Connect MetaMask</button>
+            <div id="walletInfo" class="hidden">
                 <p><strong>Connected:</strong> <span id="walletAddress"></span></p>
                 <p><strong>Network:</strong> <span id="networkName"></span></p>
-            </div>
-        </div>
-
-        <div class="contract-section">
-            <div class="contract-config">
-                <h3>Contract Configuration</h3>
-                <input type="text" id="contractAddress" placeholder="Contract Address" value="0x636449ad5E280e88BB7178985259c91628472c5f" class="input-field">
-                <button id="loadContract" class="btn btn-secondary">Load Contract</button>
-                <div id="contractStatus" class="status-info"></div>
-            </div>
-        </div>
-
-        <div class="main-content">
-            <div class="section">
-                <h2>Add Product</h2>
-                <div class="form-group">
-                    <input type="text" id="productId" placeholder="Product ID" class="input-field">
-                    <input type="text" id="productName" placeholder="Product Name" class="input-field">
-                    <input type="text" id="manufacturer" placeholder="Manufacturer" class="input-field">
-                    <div class="checkbox-group">
-                        <label>
-                            <input type="checkbox" id="isAuthentic">
-                            <span class="checkmark"></span>
-                            Product is Authentic
-                        </label>
-                    </div>
-                    <button id="addProduct" class="btn btn-primary">Add Product</button>
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>Verify Product</h2>
-                <div class="form-group">
-                    <input type="text" id="verifyProductId" placeholder="Product ID to Verify" class="input-field">
-                    <button id="verifyProduct" class="btn btn-secondary">Verify Product</button>
-                    <button id="getProduct" class="btn btn-secondary">Get Product Info</button>
-                </div>
-                <div id="verificationResult" class="result-box"></div>
-            </div>
-
-            <div class="section">
-                <h2>Product List</h2>
-                <button id="loadProducts" class="btn btn-secondary">Load All Products</button>
-                <div id="productList" class="product-list"></div>
-            </div>
-
-            <div class="section">
-                <h2>Manufacturer Management</h2>
-                <div class="form-group">
-                    <input type="text" id="manufacturerAddress" placeholder="Manufacturer Address" class="input-field">
-                    <div class="checkbox-group">
-                        <label>
-                            <input type="checkbox" id="authorizeManufacturer">
-                            <span class="checkmark"></span>
-                            Authorize Manufacturer
-                        </label>
-                    </div>
-                    <button id="setAuthorization" class="btn btn-primary">Set Authorization</button>
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>Contract Controls</h2>
-                <div class="form-group">
-                    <div class="checkbox-group">
-                        <label>
-                            <input type="checkbox" id="pauseContract">
-                            <span class="checkmark"></span>
-                            Pause Contract
-                        </label>
-                    </div>
-                    <button id="pauseBtn" class="btn btn-warning">Update Pause Status</button>
-                    <input type="text" id="newOwner" placeholder="New Owner Address" class="input-field">
-                    <button id="transferOwnership" class="btn btn-warning">Transfer Ownership</button>
+                <div class="status info" style="margin-top: 15px; padding: 10px; font-size: 0.9rem;">
+                    <strong>ℹ️ Authorization Info:</strong><br>
+                    Only the contract owner can authorize manufacturers and trackers.<br>
+                    If you're not the owner, contact the contract owner for permission.<br><br>
+                    <strong>💡 Solutions:</strong><br>
+                    1️⃣ Contact contract owner for authorization<br>
+                    2️⃣ Use query functions (no authorization needed)<br>
+                    3️⃣ Deploy your own contract
                 </div>
             </div>
         </div>
 
-        <div id="transactionStatus" class="transaction-status"></div>
+        <div class="grid">
+            <!-- Manufacturer Section -->
+            <div class="section">
+                <div class="section-header">🏭 Manufacturer Panel</div>
+                <div class="section-content">
+                    <div class="form-group">
+                        <button id="addManufacturer" class="btn">Authorize as Manufacturer</button>
+                    </div>
+
+                    <h3>Create Batch</h3>
+                    <div class="form-group">
+                        <label>Supplier Count:</label>
+                        <input type="number" id="supplierCount" placeholder="Number of suppliers" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity:</label>
+                        <input type="number" id="batchQuantity" placeholder="Batch quantity" min="1">
+                    </div>
+                    <button id="createBatch" class="btn">Create Batch</button>
+
+                    <h3>Register Product</h3>
+                    <div class="form-group">
+                        <label>Manufacturer ID:</label>
+                        <input type="number" id="manufacturerId" placeholder="Your manufacturer ID" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Quality Score (0-100):</label>
+                        <input type="number" id="qualityScore" placeholder="Quality score" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Cost:</label>
+                        <input type="number" id="productCost" placeholder="Product cost" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Batch ID:</label>
+                        <input type="number" id="productBatchId" placeholder="Batch ID" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Category:</label>
+                        <select id="productCategory">
+                            <option value="">Select category</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Food">Food</option>
+                            <option value="Pharmaceutical">Pharmaceutical</option>
+                            <option value="Automotive">Automotive</option>
+                            <option value="Textile">Textile</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <button id="registerProduct" class="btn">Register Product</button>
+
+                    <h3>Seal Batch</h3>
+                    <div class="form-group">
+                        <label>Batch ID to Seal:</label>
+                        <input type="number" id="sealBatchId" placeholder="Batch ID" min="1">
+                    </div>
+                    <button id="sealBatch" class="btn">Seal Batch</button>
+                </div>
+            </div>
+
+            <!-- Tracker Section -->
+            <div class="section">
+                <div class="section-header">📋 Tracker Panel</div>
+                <div class="section-content">
+                    <div class="form-group">
+                        <button id="addTracker" class="btn">Authorize as Tracker</button>
+                    </div>
+
+                    <h3>Add Trace Record</h3>
+                    <div class="form-group">
+                        <label>Product ID:</label>
+                        <input type="number" id="traceProductId" placeholder="Product ID to track" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Location ID:</label>
+                        <input type="number" id="locationId" placeholder="Location identifier" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Handler ID:</label>
+                        <input type="number" id="handlerId" placeholder="Handler identifier" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Quality Check:</label>
+                        <select id="qualityCheck">
+                            <option value="true">Passed</option>
+                            <option value="false">Failed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Event Type:</label>
+                        <select id="eventType">
+                            <option value="">Select event type</option>
+                            <option value="Manufacturing">Manufacturing</option>
+                            <option value="Quality Control">Quality Control</option>
+                            <option value="Packaging">Packaging</option>
+                            <option value="Shipping">Shipping</option>
+                            <option value="Warehouse Storage">Warehouse Storage</option>
+                            <option value="Distribution">Distribution</option>
+                            <option value="Retail">Retail</option>
+                            <option value="Customer Delivery">Customer Delivery</option>
+                        </select>
+                    </div>
+                    <button id="addTraceRecord" class="btn">Add Trace Record</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Query Section -->
+        <div class="section">
+            <div class="section-header">🔍 Product Query & Verification</div>
+            <div class="section-content">
+                <div class="grid">
+                    <div class="card">
+                        <h3>Product Information</h3>
+                        <div class="form-group">
+                            <label>Product ID:</label>
+                            <input type="number" id="queryProductId" placeholder="Enter Product ID" min="1">
+                        </div>
+                        <button id="queryProduct" class="btn">Get Product Info</button>
+                        <div id="productInfo" class="product-info hidden"></div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Batch Information</h3>
+                        <div class="form-group">
+                            <label>Batch ID:</label>
+                            <input type="number" id="queryBatchId" placeholder="Enter Batch ID" min="1">
+                        </div>
+                        <button id="queryBatch" class="btn">Get Batch Info</button>
+                        <div id="batchInfo" class="product-info hidden"></div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Trace History</h3>
+                        <div class="form-group">
+                            <label>Product ID:</label>
+                            <input type="number" id="traceHistoryId" placeholder="Enter Product ID" min="1">
+                        </div>
+                        <button id="getTraceHistory" class="btn">Get Trace History</button>
+                        <div id="traceHistory" class="hidden"></div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Verify Authenticity</h3>
+                        <div class="form-group">
+                            <label>Product ID:</label>
+                            <input type="number" id="verifyProductId" placeholder="Enter Product ID" min="1">
+                        </div>
+                        <button id="verifyProduct" class="btn">Verify Authenticity</button>
+                        <div id="verifyResult" class="hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="section">
+            <div class="section-header">📊 System Statistics</div>
+            <div class="section-content">
+                <div class="grid">
+                    <div class="card">
+                        <h3>Total Products</h3>
+                        <div id="totalProducts" class="status info">Loading...</div>
+                        <button id="refreshProducts" class="btn">Refresh</button>
+                    </div>
+                    <div class="card">
+                        <h3>Total Batches</h3>
+                        <div id="totalBatches" class="status info">Loading...</div>
+                        <button id="refreshBatches" class="btn">Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="statusMessage" class="status hidden"></div>
     </div>
 
-    <script src="./app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

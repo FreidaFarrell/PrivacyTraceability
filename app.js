@@ -1,600 +1,577 @@
-let provider = null;
-let signer = null;
-let contract = null;
-let userAccount = null;
-let isDemoMode = false;
+// Privacy Product Traceability System
+const CONTRACT_ADDRESS = '0xD2BF97b3D170fde0ef4c20249D31A88F9FA915AC';
 
-const DEFAULT_CONTRACT_ADDRESS = "0x636449ad5E280e88BB7178985259c91628472c5f";
-
-const contractABI = [
-    {
-        "inputs": [],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {"indexed": true, "internalType": "address", "name": "manufacturer", "type": "address"},
-            {"indexed": false, "internalType": "bool", "name": "authorized", "type": "bool"}
-        ],
-        "name": "ManufacturerAuthorized",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {"indexed": true, "internalType": "string", "name": "productId", "type": "string"},
-            {"indexed": false, "internalType": "string", "name": "productName", "type": "string"},
-            {"indexed": false, "internalType": "string", "name": "manufacturer", "type": "string"},
-            {"indexed": true, "internalType": "address", "name": "addedBy", "type": "address"},
-            {"indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256"}
-        ],
-        "name": "ProductAdded",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {"indexed": true, "internalType": "string", "name": "productId", "type": "string"},
-            {"indexed": true, "internalType": "address", "name": "verifier", "type": "address"},
-            {"indexed": false, "internalType": "uint256", "name": "timestamp", "type": "uint256"}
-        ],
-        "name": "ProductVerified",
-        "type": "event"
-    },
-    {
-        "inputs": [
-            {"internalType": "string", "name": "productId", "type": "string"},
-            {"internalType": "string", "name": "productName", "type": "string"},
-            {"internalType": "string", "name": "manufacturer", "type": "string"},
-            {"internalType": "bool", "name": "isAuthentic", "type": "bool"}
-        ],
-        "name": "addProduct",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {"internalType": "string", "name": "productId", "type": "string"},
-            {"internalType": "string", "name": "productName", "type": "string"},
-            {"internalType": "string", "name": "manufacturer", "type": "string"},
-            {"internalType": "bool", "name": "isAuthentic", "type": "bool"}
-        ],
-        "name": "addProductSafe",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{"internalType": "address", "name": "", "type": "address"}],
-        "name": "authorizedManufacturers",
-        "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{"internalType": "string[]", "name": "productIds", "type": "string[]"}],
-        "name": "bulkVerifyProducts",
-        "outputs": [{"internalType": "bool[]", "name": "", "type": "bool[]"}],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "contractPaused",
-        "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{"internalType": "string", "name": "productId", "type": "string"}],
-        "name": "getEncryptedAuthenticity",
-        "outputs": [{"internalType": "ebool", "name": "", "type": "uint256"}],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{"internalType": "string", "name": "productId", "type": "string"}],
-        "name": "getProduct",
-        "outputs": [
-            {"internalType": "string", "name": "productName", "type": "string"},
-            {"internalType": "string", "name": "manufacturer", "type": "string"},
-            {"internalType": "uint256", "name": "timestamp", "type": "uint256"}
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{"internalType": "uint256", "name": "index", "type": "uint256"}],
-        "name": "getProductIdByIndex",
-        "outputs": [{"internalType": "string", "name": "", "type": "string"}],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getTotalProducts",
-        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "owner",
-        "outputs": [{"internalType": "address", "name": "", "type": "address"}],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{"internalType": "bool", "name": "paused", "type": "bool"}],
-        "name": "pauseContract",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{"internalType": "string", "name": "productId", "type": "string"}],
-        "name": "productExists",
-        "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-        "name": "productIds",
-        "outputs": [{"internalType": "string", "name": "", "type": "string"}],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {"internalType": "address", "name": "manufacturer", "type": "address"},
-            {"internalType": "bool", "name": "authorized", "type": "bool"}
-        ],
-        "name": "setManufacturerAuthorization",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{"internalType": "address", "name": "newOwner", "type": "address"}],
-        "name": "transferOwnership",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [{"internalType": "string", "name": "productId", "type": "string"}],
-        "name": "verifyProduct",
-        "outputs": [{"internalType": "ebool", "name": "", "type": "uint256"}],
-        "stateMutability": "view",
-        "type": "function"
-    }
+// Contract ABI - Privacy Traceability Contract
+const CONTRACT_ABI = [
+    "function owner() view returns (address)",
+    "function nextProductId() view returns (uint256)",
+    "function nextBatchId() view returns (uint256)",
+    "function authorizedTrackers(address) view returns (bool)",
+    "function authorizedManufacturers(address) view returns (bool)",
+    "function addAuthorizedTracker(address tracker)",
+    "function removeAuthorizedTracker(address tracker)",
+    "function addAuthorizedManufacturer(address manufacturer)",
+    "function removeAuthorizedManufacturer(address manufacturer)",
+    "function createBatch(uint32 supplierCount, uint32 quantity) returns (uint256)",
+    "function registerProduct(uint32 manufacturerId, uint32 qualityScore, uint32 cost, uint256 batchId, string memory category) returns (uint256)",
+    "function addTraceRecord(uint256 productId, uint32 locationId, uint32 handlerId, bool qualityCheckPassed, string memory eventType)",
+    "function sealBatch(uint256 batchId)",
+    "function verifyProductAuthenticity(uint256 productId) view returns (bool)",
+    "function getProductInfo(uint256 productId) view returns (address manufacturer, uint256 batchId, string memory category, uint256 traceRecordCount)",
+    "function getBatchInfo(uint256 batchId) view returns (bool isSealed, address batchOwner, uint256 productCount)",
+    "function getTraceRecordCount(uint256 productId) view returns (uint256)",
+    "function getPublicTraceInfo(uint256 productId, uint256 recordIndex) view returns (address recorder, string memory eventType)",
+    "function requestProductDecryption(uint256 productId)",
+    "function getTotalProducts() view returns (uint256)",
+    "function getTotalBatches() view returns (uint256)",
+    "event ProductRegistered(uint256 indexed productId, address indexed manufacturer, uint256 batchId)",
+    "event BatchCreated(uint256 indexed batchId, address indexed owner)",
+    "event TraceRecordAdded(uint256 indexed productId, address indexed recorder, string eventType)",
+    "event QualityCheckPerformed(uint256 indexed productId, address indexed checker)",
+    "event BatchSealed(uint256 indexed batchId)"
 ];
 
-function showStatus(message, type = 'info') {
-    const statusEl = document.getElementById('transactionStatus');
-    statusEl.textContent = message;
-    statusEl.className = `transaction-status show ${type}`;
+class PrivacyTraceabilityApp {
+    constructor() {
+        this.provider = null;
+        this.signer = null;
+        this.contract = null;
+        this.userAddress = null;
+        this.isConnected = false;
 
-    setTimeout(() => {
-        statusEl.classList.remove('show');
-    }, 5000);
-}
-
-async function connectWallet() {
-    try {
-        if (typeof window.ethereum === 'undefined') {
-            throw new Error('MetaMask is not installed');
-        }
-
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        signer = provider.getSigner();
-        userAccount = await signer.getAddress();
-
-        const network = await provider.getNetwork();
-
-        document.getElementById('walletAddress').textContent =
-            `${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
-        document.getElementById('networkName').textContent = network.name;
-        document.getElementById('walletInfo').style.display = 'block';
-        document.getElementById('connectWallet').textContent = 'Connected';
-        document.getElementById('connectWallet').disabled = true;
-
-        showStatus('Wallet connected successfully', 'success');
-
-        // Auto-load the default contract
-        document.getElementById('contractAddress').value = DEFAULT_CONTRACT_ADDRESS;
-        await loadContract();
-
-    } catch (error) {
-        console.error('Connection error:', error);
-        showStatus(`Connection failed: ${error.message}`, 'error');
-    }
-}
-
-async function loadContract() {
-    try {
-        const contractAddress = document.getElementById('contractAddress').value;
-
-        if (!contractAddress) {
-            throw new Error('Please enter contract address');
-        }
-
-        if (!signer) {
-            throw new Error('Please connect wallet first');
-        }
-
-        contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-        const owner = await contract.owner();
-        const isAuthorized = await contract.authorizedManufacturers(userAccount);
-        const isOwner = userAccount.toLowerCase() === owner.toLowerCase();
-        const isPaused = await contract.contractPaused();
-
-        let statusHtml = `<div class="status-success">Contract loaded successfully.<br>`;
-        statusHtml += `Owner: ${owner.substring(0, 6)}...${owner.substring(38)}<br>`;
-        statusHtml += `Your Status: ${isOwner ? 'Contract Owner' : isAuthorized ? 'Authorized Manufacturer' : 'Not Authorized'}<br>`;
-        statusHtml += `Contract Status: ${isPaused ? 'Paused' : 'Active'}`;
-        statusHtml += `</div>`;
-
-        document.getElementById('contractStatus').innerHTML = statusHtml;
-
-        if (!isAuthorized && !isOwner) {
-            showStatus('Contract loaded but you are not authorized to add products', 'error');
-        } else if (isPaused) {
-            showStatus('Contract loaded but is currently paused', 'error');
-        } else {
-            showStatus('Contract loaded successfully - you can add products', 'success');
-        }
-
-    } catch (error) {
-        console.error('Contract loading error:', error);
-        document.getElementById('contractStatus').innerHTML =
-            `<div class="status-error">Failed to load contract: ${error.message}</div>`;
-        showStatus(`Contract loading failed: ${error.message}`, 'error');
-    }
-}
-
-async function addProduct() {
-    const productId = document.getElementById('productId').value;
-    const productName = document.getElementById('productName').value;
-    const manufacturer = document.getElementById('manufacturer').value;
-    const isAuthentic = document.getElementById('isAuthentic').checked;
-
-    if (!productId || !productName || !manufacturer) {
-        showStatus('Please fill all fields', 'error');
-        return;
+        this.initializeApp();
     }
 
-    if (isDemoMode) {
-        return addProductDemo(productId, productName, manufacturer, isAuthentic);
+    async initializeApp() {
+        this.bindEvents();
+        await this.checkConnection();
+        await this.loadStatistics();
     }
 
-    try {
-        if (!contract) {
-            enableDemoMode();
-            return addProductDemo(productId, productName, manufacturer, isAuthentic);
-        }
+    bindEvents() {
+        // Wallet connection
+        document.getElementById('connectWallet').addEventListener('click', () => this.connectWallet());
 
-        showStatus('Adding product to blockchain...', 'loading');
+        // Manufacturer actions
+        document.getElementById('addManufacturer').addEventListener('click', () => this.addManufacturer());
+        document.getElementById('createBatch').addEventListener('click', () => this.createBatch());
+        document.getElementById('registerProduct').addEventListener('click', () => this.registerProduct());
+        document.getElementById('sealBatch').addEventListener('click', () => this.sealBatch());
 
-        // Try blockchain transaction
-        const tx = await contract.addProduct(productId, productName, manufacturer, isAuthentic);
-        const receipt = await tx.wait();
+        // Tracker actions
+        document.getElementById('addTracker').addEventListener('click', () => this.addTracker());
+        document.getElementById('addTraceRecord').addEventListener('click', () => this.addTraceRecord());
 
-        showStatus(`Product added successfully! Transaction: ${tx.hash}`, 'success');
+        // Query actions
+        document.getElementById('queryProduct').addEventListener('click', () => this.queryProduct());
+        document.getElementById('queryBatch').addEventListener('click', () => this.queryBatch());
+        document.getElementById('getTraceHistory').addEventListener('click', () => this.getTraceHistory());
+        document.getElementById('verifyProduct').addEventListener('click', () => this.verifyProduct());
 
-        // Clear form
-        document.getElementById('productId').value = '';
-        document.getElementById('productName').value = '';
-        document.getElementById('manufacturer').value = '';
-        document.getElementById('isAuthentic').checked = false;
-
-        // Add to UI
-        addProductToUI({
-            productId,
-            productName,
-            manufacturer,
-            isAuthentic,
-            timestamp: new Date().toISOString(),
-            txHash: tx.hash
-        });
-
-    } catch (error) {
-        console.log('Blockchain transaction failed, switching to demo mode:', error);
-        enableDemoMode();
-        return addProductDemo(productId, productName, manufacturer, isAuthentic);
+        // Statistics
+        document.getElementById('refreshProducts').addEventListener('click', () => this.refreshProducts());
+        document.getElementById('refreshBatches').addEventListener('click', () => this.refreshBatches());
     }
-}
 
-async function addProductDemo(productId, productName, manufacturer, isAuthentic) {
-    showStatus('Adding product in demo mode...', 'loading');
-
-    // Simulate transaction delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    const demoProduct = {
-        productId: `${productId}_${Date.now()}`,
-        productName,
-        manufacturer,
-        isAuthentic,
-        timestamp: new Date().toISOString(),
-        txHash: `0xdemo${Date.now()}`,
-        isDemo: true
-    };
-
-    addProductToUI(demoProduct);
-
-    showStatus('Product added successfully in demo mode!', 'success');
-
-    // Clear form
-    document.getElementById('productId').value = '';
-    document.getElementById('productName').value = '';
-    document.getElementById('manufacturer').value = '';
-    document.getElementById('isAuthentic').checked = false;
-}
-
-function enableDemoMode() {
-    if (isDemoMode) return;
-
-    isDemoMode = true;
-
-    // Update contract status to show demo mode
-    document.getElementById('contractStatus').innerHTML =
-        `<div class="status-info empty">🔄 Demo Mode Active - Transactions are simulated locally</div>`;
-
-    showStatus('Switched to demo mode - all transactions will be simulated', 'loading');
-
-    console.log('Demo mode enabled - all transactions will be simulated');
-}
-
-async function verifyProduct() {
-    try {
-        if (!contract) {
-            throw new Error('Please load contract first');
+    async checkConnection() {
+        if (window.ethereum) {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                if (accounts.length > 0) {
+                    await this.connectWallet();
+                }
+            } catch (error) {
+                console.log('No previous connection');
+            }
         }
-
-        const productId = document.getElementById('verifyProductId').value;
-        if (!productId) {
-            throw new Error('Please enter product ID');
-        }
-
-        showStatus('Verifying product...', 'loading');
-
-        const exists = await contract.productExists(productId);
-
-        let resultHtml = '';
-        if (exists) {
-            const encryptedAuth = await contract.verifyProduct(productId);
-            resultHtml = `
-                <div class="status-success">
-                    <h4>Product Found</h4>
-                    <p><strong>Product ID:</strong> ${productId}</p>
-                    <p><strong>Encrypted Authenticity:</strong> ${encryptedAuth.toString()}</p>
-                    <p><em>Note: Authenticity is encrypted using FHE and can only be decrypted by authorized parties.</em></p>
-                </div>
-            `;
-        } else {
-            resultHtml = `<div class="status-error">Product not found in the system</div>`;
-        }
-
-        document.getElementById('verificationResult').innerHTML = resultHtml;
-        showStatus('Product verification completed', 'success');
-
-    } catch (error) {
-        console.error('Verify product error:', error);
-        document.getElementById('verificationResult').innerHTML =
-            `<div class="status-error">Verification failed: ${error.message}</div>`;
-        showStatus(`Verification failed: ${error.message}`, 'error');
     }
-}
 
-async function getProduct() {
-    try {
-        if (!contract) {
-            throw new Error('Please load contract first');
+    async connectWallet() {
+        try {
+            if (!window.ethereum) {
+                this.showStatus('Please install MetaMask!', 'error');
+                return;
+            }
+
+            this.showStatus('Connecting wallet...', 'info');
+
+            const accounts = await window.ethereum.request({
+                method: 'eth_requestAccounts'
+            });
+
+            this.provider = new ethers.providers.Web3Provider(window.ethereum);
+            this.signer = this.provider.getSigner();
+            this.contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, this.signer);
+            this.userAddress = accounts[0];
+            this.isConnected = true;
+
+            const network = await this.provider.getNetwork();
+
+            document.getElementById('walletAddress').textContent =
+                `${this.userAddress.slice(0, 6)}...${this.userAddress.slice(-4)}`;
+            document.getElementById('networkName').textContent = network.name || `Chain ID: ${network.chainId}`;
+            document.getElementById('walletInfo').classList.remove('hidden');
+            document.getElementById('connectWallet').style.display = 'none';
+
+            this.showStatus('Wallet connected successfully!', 'success');
+            await this.loadStatistics();
+
+            // Listen for account changes
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                    this.disconnectWallet();
+                } else {
+                    this.userAddress = accounts[0];
+                    document.getElementById('walletAddress').textContent =
+                        `${this.userAddress.slice(0, 6)}...${this.userAddress.slice(-4)}`;
+                }
+            });
+
+        } catch (error) {
+            console.error('Connection failed:', error);
+            this.showStatus('Failed to connect wallet: ' + error.message, 'error');
         }
-
-        const productId = document.getElementById('verifyProductId').value;
-        if (!productId) {
-            throw new Error('Please enter product ID');
-        }
-
-        showStatus('Getting product information...', 'loading');
-
-        const exists = await contract.productExists(productId);
-
-        if (!exists) {
-            throw new Error('Product does not exist');
-        }
-
-        const productInfo = await contract.getProduct(productId);
-
-        const resultHtml = `
-            <div class="status-success">
-                <h4>Product Information</h4>
-                <p><strong>Product ID:</strong> ${productId}</p>
-                <p><strong>Product Name:</strong> ${productInfo.productName}</p>
-                <p><strong>Manufacturer:</strong> ${productInfo.manufacturer}</p>
-                <p><strong>Timestamp:</strong> ${new Date(productInfo.timestamp * 1000).toLocaleString()}</p>
-            </div>
-        `;
-
-        document.getElementById('verificationResult').innerHTML = resultHtml;
-        showStatus('Product information retrieved', 'success');
-
-    } catch (error) {
-        console.error('Get product error:', error);
-        document.getElementById('verificationResult').innerHTML =
-            `<div class="status-error">Failed to get product info: ${error.message}</div>`;
-        showStatus(`Failed to get product info: ${error.message}`, 'error');
     }
-}
 
-async function loadProducts() {
-    try {
-        if (!contract) {
-            throw new Error('Please load contract first');
+    disconnectWallet() {
+        this.provider = null;
+        this.signer = null;
+        this.contract = null;
+        this.userAddress = null;
+        this.isConnected = false;
+
+        document.getElementById('walletInfo').classList.add('hidden');
+        document.getElementById('connectWallet').style.display = 'block';
+        this.showStatus('Wallet disconnected', 'info');
+    }
+
+    async addManufacturer() {
+        if (!this.ensureConnected()) return;
+
+        try {
+            this.showStatus('Adding manufacturer authorization...', 'info');
+            const tx = await this.contract.addAuthorizedManufacturer(this.userAddress);
+            await tx.wait();
+            this.showStatus('Successfully authorized as manufacturer!', 'success');
+        } catch (error) {
+            console.error('Add manufacturer failed:', error);
+            if (error.message.includes('Not authorized owner')) {
+                this.showStatus('Error: Only the contract owner can authorize manufacturers. Contact the contract owner to get authorization.', 'error');
+            } else {
+                this.showStatus('Failed to add manufacturer: ' + this.getErrorMessage(error), 'error');
+            }
         }
+    }
 
-        showStatus('Loading all products...', 'loading');
+    async addTracker() {
+        if (!this.ensureConnected()) return;
 
-        const totalProducts = await contract.getTotalProducts();
-        const productListEl = document.getElementById('productList');
+        try {
+            this.showStatus('Adding tracker authorization...', 'info');
+            const tx = await this.contract.addAuthorizedTracker(this.userAddress);
+            await tx.wait();
+            this.showStatus('Successfully authorized as tracker!', 'success');
+        } catch (error) {
+            console.error('Add tracker failed:', error);
+            if (error.message.includes('Not authorized owner')) {
+                this.showStatus('Error: Only the contract owner can authorize trackers. Contact the contract owner to get authorization.', 'error');
+            } else {
+                this.showStatus('Failed to add tracker: ' + this.getErrorMessage(error), 'error');
+            }
+        }
+    }
 
-        if (totalProducts.toNumber() === 0) {
-            productListEl.innerHTML = '<div class="status-info empty">No products found in the system</div>';
+    async createBatch() {
+        if (!this.ensureConnected()) return;
+
+        const supplierCount = parseInt(document.getElementById('supplierCount').value);
+        const quantity = parseInt(document.getElementById('batchQuantity').value);
+
+        if (!supplierCount || !quantity) {
+            this.showStatus('Please enter valid supplier count and quantity', 'error');
             return;
         }
 
-        let productsHtml = '';
+        try {
+            this.showStatus('Creating batch...', 'info');
+            const tx = await this.contract.createBatch(supplierCount, quantity);
+            const receipt = await tx.wait();
 
-        for (let i = 0; i < totalProducts; i++) {
-            try {
-                const productId = await contract.getProductIdByIndex(i);
-                const productInfo = await contract.getProduct(productId);
+            // Extract batch ID from events
+            const event = receipt.events?.find(e => e.event === 'BatchCreated');
+            const batchId = event ? event.args.batchId.toString() : 'Unknown';
 
-                productsHtml += `
-                    <div class="product-item">
-                        <h4>${productInfo.productName}</h4>
-                        <p><strong>ID:</strong> ${productId}</p>
-                        <p><strong>Manufacturer:</strong> ${productInfo.manufacturer}</p>
-                        <p><strong>Added:</strong> ${new Date(productInfo.timestamp * 1000).toLocaleString()}</p>
-                    </div>
-                `;
-            } catch (error) {
-                console.error(`Error loading product ${i}:`, error);
+            this.showStatus(`Batch created successfully! Batch ID: ${batchId}`, 'success');
+
+            // Clear form
+            document.getElementById('supplierCount').value = '';
+            document.getElementById('batchQuantity').value = '';
+
+            await this.refreshBatches();
+        } catch (error) {
+            console.error('Create batch failed:', error);
+            this.showStatus('Failed to create batch: ' + this.getErrorMessage(error), 'error');
+        }
+    }
+
+    async registerProduct() {
+        if (!this.ensureConnected()) return;
+
+        const manufacturerId = parseInt(document.getElementById('manufacturerId').value);
+        const qualityScore = parseInt(document.getElementById('qualityScore').value);
+        const cost = parseInt(document.getElementById('productCost').value);
+        const batchId = parseInt(document.getElementById('productBatchId').value);
+        const category = document.getElementById('productCategory').value;
+
+        if (!manufacturerId || qualityScore === undefined || !cost || !batchId || !category) {
+            this.showStatus('Please fill all product registration fields', 'error');
+            return;
+        }
+
+        if (qualityScore < 0 || qualityScore > 100) {
+            this.showStatus('Quality score must be between 0 and 100', 'error');
+            return;
+        }
+
+        try {
+            this.showStatus('Registering product...', 'info');
+            const tx = await this.contract.registerProduct(manufacturerId, qualityScore, cost, batchId, category);
+            const receipt = await tx.wait();
+
+            // Extract product ID from events
+            const event = receipt.events?.find(e => e.event === 'ProductRegistered');
+            const productId = event ? event.args.productId.toString() : 'Unknown';
+
+            this.showStatus(`Product registered successfully! Product ID: ${productId}`, 'success');
+
+            // Clear form
+            document.getElementById('manufacturerId').value = '';
+            document.getElementById('qualityScore').value = '';
+            document.getElementById('productCost').value = '';
+            document.getElementById('productBatchId').value = '';
+            document.getElementById('productCategory').value = '';
+
+            await this.refreshProducts();
+        } catch (error) {
+            console.error('Register product failed:', error);
+            this.showStatus('Failed to register product: ' + this.getErrorMessage(error), 'error');
+        }
+    }
+
+    async sealBatch() {
+        if (!this.ensureConnected()) return;
+
+        const batchId = parseInt(document.getElementById('sealBatchId').value);
+
+        if (!batchId) {
+            this.showStatus('Please enter a valid batch ID', 'error');
+            return;
+        }
+
+        try {
+            this.showStatus('Sealing batch...', 'info');
+            const tx = await this.contract.sealBatch(batchId);
+            await tx.wait();
+            this.showStatus(`Batch ${batchId} sealed successfully!`, 'success');
+
+            document.getElementById('sealBatchId').value = '';
+        } catch (error) {
+            console.error('Seal batch failed:', error);
+            this.showStatus('Failed to seal batch: ' + this.getErrorMessage(error), 'error');
+        }
+    }
+
+    async addTraceRecord() {
+        if (!this.ensureConnected()) return;
+
+        const productId = parseInt(document.getElementById('traceProductId').value);
+        const locationId = parseInt(document.getElementById('locationId').value);
+        const handlerId = parseInt(document.getElementById('handlerId').value);
+        const qualityCheck = document.getElementById('qualityCheck').value === 'true';
+        const eventType = document.getElementById('eventType').value;
+
+        if (!productId || !locationId || !handlerId || !eventType) {
+            this.showStatus('Please fill all trace record fields', 'error');
+            return;
+        }
+
+        try {
+            this.showStatus('Adding trace record...', 'info');
+            const tx = await this.contract.addTraceRecord(productId, locationId, handlerId, qualityCheck, eventType);
+            await tx.wait();
+            this.showStatus(`Trace record added successfully for Product ID: ${productId}`, 'success');
+
+            // Clear form
+            document.getElementById('traceProductId').value = '';
+            document.getElementById('locationId').value = '';
+            document.getElementById('handlerId').value = '';
+            document.getElementById('qualityCheck').value = 'true';
+            document.getElementById('eventType').value = '';
+        } catch (error) {
+            console.error('Add trace record failed:', error);
+            this.showStatus('Failed to add trace record: ' + this.getErrorMessage(error), 'error');
+        }
+    }
+
+    async queryProduct() {
+        if (!this.ensureConnected()) return;
+
+        const productId = parseInt(document.getElementById('queryProductId').value);
+
+        if (!productId) {
+            this.showStatus('Please enter a valid product ID', 'error');
+            return;
+        }
+
+        try {
+            this.showStatus('Querying product...', 'info');
+            const result = await this.contract.getProductInfo(productId);
+
+            const productInfo = document.getElementById('productInfo');
+            productInfo.innerHTML = `
+                <h4>Product ID: ${productId}</h4>
+                <p><strong>Manufacturer:</strong> ${result.manufacturer}</p>
+                <p><strong>Batch ID:</strong> ${result.batchId.toString()}</p>
+                <p><strong>Category:</strong> ${result.category}</p>
+                <p><strong>Trace Records:</strong> ${result.traceRecordCount.toString()}</p>
+            `;
+            productInfo.classList.remove('hidden');
+
+            this.showStatus('Product information retrieved successfully!', 'success');
+        } catch (error) {
+            console.error('Query product failed:', error);
+            this.showStatus('Failed to query product: ' + this.getErrorMessage(error), 'error');
+        }
+    }
+
+    async queryBatch() {
+        if (!this.ensureConnected()) return;
+
+        const batchId = parseInt(document.getElementById('queryBatchId').value);
+
+        if (!batchId) {
+            this.showStatus('Please enter a valid batch ID', 'error');
+            return;
+        }
+
+        try {
+            this.showStatus('Querying batch...', 'info');
+            const result = await this.contract.getBatchInfo(batchId);
+
+            const batchInfo = document.getElementById('batchInfo');
+            batchInfo.innerHTML = `
+                <h4>Batch ID: ${batchId}</h4>
+                <p><strong>Status:</strong> ${result.isSealed ? 'Sealed' : 'Open'}</p>
+                <p><strong>Owner:</strong> ${result.batchOwner}</p>
+                <p><strong>Product Count:</strong> ${result.productCount.toString()}</p>
+            `;
+            batchInfo.classList.remove('hidden');
+
+            this.showStatus('Batch information retrieved successfully!', 'success');
+        } catch (error) {
+            console.error('Query batch failed:', error);
+            this.showStatus('Failed to query batch: ' + this.getErrorMessage(error), 'error');
+        }
+    }
+
+    async getTraceHistory() {
+        if (!this.ensureConnected()) return;
+
+        const productId = parseInt(document.getElementById('traceHistoryId').value);
+
+        if (!productId) {
+            this.showStatus('Please enter a valid product ID', 'error');
+            return;
+        }
+
+        try {
+            this.showStatus('Getting trace history...', 'info');
+            const recordCount = await this.contract.getTraceRecordCount(productId);
+
+            if (recordCount.eq(0)) {
+                this.showStatus('No trace records found for this product', 'info');
+                return;
             }
+
+            let historyHtml = `<h4>Trace History for Product ID: ${productId}</h4>`;
+
+            for (let i = 0; i < recordCount.toNumber(); i++) {
+                try {
+                    const record = await this.contract.getPublicTraceInfo(productId, i);
+                    historyHtml += `
+                        <div class="trace-record">
+                            <p><strong>Record ${i + 1}:</strong></p>
+                            <p><strong>Recorder:</strong> ${record.recorder}</p>
+                            <p><strong>Event Type:</strong> ${record.eventType}</p>
+                        </div>
+                    `;
+                } catch (recordError) {
+                    historyHtml += `
+                        <div class="trace-record">
+                            <p><strong>Record ${i + 1}:</strong> Failed to load</p>
+                        </div>
+                    `;
+                }
+            }
+
+            const traceHistory = document.getElementById('traceHistory');
+            traceHistory.innerHTML = historyHtml;
+            traceHistory.classList.remove('hidden');
+
+            this.showStatus('Trace history retrieved successfully!', 'success');
+        } catch (error) {
+            console.error('Get trace history failed:', error);
+            this.showStatus('Failed to get trace history: ' + this.getErrorMessage(error), 'error');
+        }
+    }
+
+    async verifyProduct() {
+        if (!this.ensureConnected()) return;
+
+        const productId = parseInt(document.getElementById('verifyProductId').value);
+
+        if (!productId) {
+            this.showStatus('Please enter a valid product ID', 'error');
+            return;
         }
 
-        productListEl.innerHTML = productsHtml;
-        showStatus(`Loaded ${totalProducts} products`, 'success');
+        try {
+            this.showStatus('Verifying product authenticity...', 'info');
+            const isAuthentic = await this.contract.verifyProductAuthenticity(productId);
 
-    } catch (error) {
-        console.error('Load products error:', error);
-        document.getElementById('productList').innerHTML =
-            `<div class="status-error">Failed to load products: ${error.message}</div>`;
-        showStatus(`Failed to load products: ${error.message}`, 'error');
+            const verifyResult = document.getElementById('verifyResult');
+            verifyResult.innerHTML = `
+                <h4>Verification Result for Product ID: ${productId}</h4>
+                <p class="status ${isAuthentic ? 'success' : 'error'}">
+                    <strong>${isAuthentic ? '✅ AUTHENTIC' : '❌ NOT AUTHENTIC'}</strong>
+                </p>
+                <p>${isAuthentic ? 'This product is verified as authentic.' : 'This product could not be verified as authentic.'}</p>
+            `;
+            verifyResult.classList.remove('hidden');
+
+            this.showStatus(`Product verification completed: ${isAuthentic ? 'Authentic' : 'Not Authentic'}`,
+                isAuthentic ? 'success' : 'error');
+        } catch (error) {
+            console.error('Verify product failed:', error);
+            this.showStatus('Failed to verify product: ' + this.getErrorMessage(error), 'error');
+        }
+    }
+
+    async loadStatistics() {
+        await this.refreshProducts();
+        await this.refreshBatches();
+        await this.checkAuthorizations();
+    }
+
+    async checkAuthorizations() {
+        if (!this.isConnected) return;
+
+        try {
+            const owner = await this.contract.owner();
+            const isAuthorizedManufacturer = await this.contract.authorizedManufacturers(this.userAddress);
+            const isAuthorizedTracker = await this.contract.authorizedTrackers(this.userAddress);
+
+            // Display contract owner info
+            let ownerInfoHtml = `
+                <div class="product-info">
+                    <h4>📋 Contract Information</h4>
+                    <p><strong>Contract Owner:</strong> ${owner}</p>
+                    <p><strong>Your Address:</strong> ${this.userAddress}</p>
+                    <p><strong>Are you the owner?</strong> ${this.userAddress.toLowerCase() === owner.toLowerCase() ? 'Yes ✅' : 'No ❌'}</p>
+                    <p><strong>Manufacturer Status:</strong> ${isAuthorizedManufacturer ? 'Authorized ✅' : 'Not Authorized ❌'}</p>
+                    <p><strong>Tracker Status:</strong> ${isAuthorizedTracker ? 'Authorized ✅' : 'Not Authorized ❌'}</p>
+                </div>
+            `;
+
+            // Update the wallet section with authorization info
+            const walletInfo = document.getElementById('walletInfo');
+            let existingAuthInfo = walletInfo.querySelector('.auth-info');
+            if (!existingAuthInfo) {
+                existingAuthInfo = document.createElement('div');
+                existingAuthInfo.className = 'auth-info';
+                walletInfo.appendChild(existingAuthInfo);
+            }
+            existingAuthInfo.innerHTML = ownerInfoHtml;
+
+            let statusMsg = `Contract Owner: ${owner.slice(0, 6)}...${owner.slice(-4)}`;
+            if (this.userAddress.toLowerCase() === owner.toLowerCase()) {
+                statusMsg += ' (You are the owner)';
+                this.showStatus('✅ You are the contract owner! You can authorize manufacturers and trackers.', 'success');
+            } else {
+                this.showStatus('ℹ️ You are not the contract owner. Only the owner can authorize users.', 'info');
+            }
+
+            console.log(`Full contract owner address: ${owner}`);
+            console.log(`Your address: ${this.userAddress}`);
+        } catch (error) {
+            console.error('Failed to check authorizations:', error);
+        }
+    }
+
+    async refreshProducts() {
+        if (!this.isConnected) {
+            document.getElementById('totalProducts').textContent = 'Connect wallet to view';
+            return;
+        }
+
+        try {
+            const total = await this.contract.getTotalProducts();
+            document.getElementById('totalProducts').textContent = total.toString();
+        } catch (error) {
+            document.getElementById('totalProducts').textContent = 'Error loading';
+            console.error('Failed to load total products:', error);
+        }
+    }
+
+    async refreshBatches() {
+        if (!this.isConnected) {
+            document.getElementById('totalBatches').textContent = 'Connect wallet to view';
+            return;
+        }
+
+        try {
+            const total = await this.contract.getTotalBatches();
+            document.getElementById('totalBatches').textContent = total.toString();
+        } catch (error) {
+            document.getElementById('totalBatches').textContent = 'Error loading';
+            console.error('Failed to load total batches:', error);
+        }
+    }
+
+    ensureConnected() {
+        if (!this.isConnected) {
+            this.showStatus('Please connect your wallet first', 'error');
+            return false;
+        }
+        return true;
+    }
+
+    showStatus(message, type) {
+        const statusElement = document.getElementById('statusMessage');
+        statusElement.textContent = message;
+        statusElement.className = `status ${type}`;
+        statusElement.classList.remove('hidden');
+
+        // Auto-hide success messages
+        if (type === 'success') {
+            setTimeout(() => {
+                statusElement.classList.add('hidden');
+            }, 5000);
+        }
+    }
+
+    getErrorMessage(error) {
+        if (error.data?.message) {
+            return error.data.message;
+        } else if (error.message) {
+            return error.message;
+        } else {
+            return 'An unknown error occurred';
+        }
     }
 }
 
-async function setAuthorization() {
-    try {
-        if (!contract) {
-            throw new Error('Please load contract first');
-        }
-
-        const manufacturerAddress = document.getElementById('manufacturerAddress').value;
-        const authorized = document.getElementById('authorizeManufacturer').checked;
-
-        if (!manufacturerAddress) {
-            throw new Error('Please enter manufacturer address');
-        }
-
-        showStatus('Setting manufacturer authorization...', 'loading');
-
-        const tx = await contract.setManufacturerAuthorization(manufacturerAddress, authorized);
-        await tx.wait();
-
-        showStatus(`Manufacturer authorization ${authorized ? 'granted' : 'revoked'} successfully`, 'success');
-
-        document.getElementById('manufacturerAddress').value = '';
-        document.getElementById('authorizeManufacturer').checked = false;
-
-    } catch (error) {
-        console.error('Set authorization error:', error);
-        showStatus(`Failed to set authorization: ${error.message}`, 'error');
-    }
-}
-
-async function updatePauseStatus() {
-    try {
-        if (!contract) {
-            throw new Error('Please load contract first');
-        }
-
-        const paused = document.getElementById('pauseContract').checked;
-
-        showStatus('Updating contract pause status...', 'loading');
-
-        const tx = await contract.pauseContract(paused);
-        await tx.wait();
-
-        showStatus(`Contract ${paused ? 'paused' : 'unpaused'} successfully`, 'success');
-
-    } catch (error) {
-        console.error('Pause contract error:', error);
-        showStatus(`Failed to update pause status: ${error.message}`, 'error');
-    }
-}
-
-async function transferOwnership() {
-    try {
-        if (!contract) {
-            throw new Error('Please load contract first');
-        }
-
-        const newOwner = document.getElementById('newOwner').value;
-
-        if (!newOwner) {
-            throw new Error('Please enter new owner address');
-        }
-
-        showStatus('Transferring ownership...', 'loading');
-
-        const tx = await contract.transferOwnership(newOwner);
-        await tx.wait();
-
-        showStatus('Ownership transferred successfully', 'success');
-        document.getElementById('newOwner').value = '';
-
-    } catch (error) {
-        console.error('Transfer ownership error:', error);
-        showStatus(`Failed to transfer ownership: ${error.message}`, 'error');
-    }
-}
-
-function addProductToUI(productData) {
-    const productListEl = document.getElementById('productList');
-
-    // Create product item
-    const productItem = document.createElement('div');
-    productItem.className = 'product-item';
-
-    const statusBadge = productData.isDemo ?
-        '<span style="background: #f39c12; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.8em;">DEMO</span>' :
-        '<span style="background: #27ae60; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.8em;">BLOCKCHAIN</span>';
-
-    productItem.innerHTML = `
-        <h4>${productData.productName} ${statusBadge}</h4>
-        <p><strong>ID:</strong> ${productData.productId}</p>
-        <p><strong>Manufacturer:</strong> ${productData.manufacturer}</p>
-        <p><strong>Authentic:</strong> ${productData.isAuthentic ? '✅ Yes' : '❌ No'}</p>
-        <p><strong>Added:</strong> ${new Date(productData.timestamp).toLocaleString()}</p>
-        ${productData.txHash && !productData.isDemo ?
-            `<p><strong>Transaction:</strong> <a href="https://sepolia.etherscan.io/tx/${productData.txHash}" target="_blank">${productData.txHash.substring(0, 10)}...</a></p>` :
-            productData.isDemo ?
-                `<p><strong>Demo ID:</strong> ${productData.txHash}</p>` : ''
-        }
-    `;
-
-    // Add to top of list
-    productListEl.insertBefore(productItem, productListEl.firstChild);
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('connectWallet').addEventListener('click', connectWallet);
-    document.getElementById('loadContract').addEventListener('click', loadContract);
-    document.getElementById('addProduct').addEventListener('click', addProduct);
-    document.getElementById('verifyProduct').addEventListener('click', verifyProduct);
-    document.getElementById('getProduct').addEventListener('click', getProduct);
-    document.getElementById('loadProducts').addEventListener('click', loadProducts);
-    document.getElementById('setAuthorization').addEventListener('click', setAuthorization);
-    document.getElementById('pauseBtn').addEventListener('click', updatePauseStatus);
-    document.getElementById('transferOwnership').addEventListener('click', transferOwnership);
+// Initialize the application
+document.addEventListener('DOMContentLoaded', () => {
+    new PrivacyTraceabilityApp();
 });
