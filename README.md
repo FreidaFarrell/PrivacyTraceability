@@ -1,110 +1,173 @@
-# Privacy Traceability System
+# Privacy Traceability - Confidential Product Tracking System
 
-A revolutionary blockchain-based product traceability solution leveraging **Fully Homomorphic Encryption (FHE)** to ensure complete privacy while maintaining transparency and trust in supply chain management.
+🔒 **A revolutionary blockchain-based product traceability system using Fully Homomorphic Encryption (FHE) to ensure complete privacy and confidentiality in supply chain tracking.**
 
-## 🔐 Core Concepts
+## 🌟 Live Demo
 
-### FHE Smart Contract
-Our system utilizes **Fully Homomorphic Encryption (FHE)** technology to encrypt product authenticity data directly on the blockchain. This groundbreaking approach allows verification of product legitimacy without revealing sensitive information, ensuring that:
+🌐 **Website**: [https://privacy-traceability.vercel.app/](https://privacy-traceability.vercel.app/)
+📱 **GitHub Repository**: [https://github.com/FreidaFarrell/PrivacyTraceability](https://github.com/FreidaFarrell/PrivacyTraceability)
+🎥 **Demo Video**: Available in the repository
 
-- Product authenticity remains encrypted at all times
-- Only authorized parties can decrypt verification results
-- Zero-knowledge proofs maintain privacy while enabling trust
-- Computational operations can be performed on encrypted data
+## 🔑 Core Concepts
 
-### Confidential Traceability System
-The Privacy Traceability System creates a **confidential tracking infrastructure** where:
+### Fully Homomorphic Encryption (FHE) Contract
+Our system leverages cutting-edge **Fully Homomorphic Encryption (FHE)** technology to enable:
+- **Encrypted Data Processing**: Perform computations on encrypted data without decryption
+- **Zero-Knowledge Verification**: Verify product authenticity without revealing sensitive information
+- **Confidential Operations**: Execute smart contract functions while keeping data private
+- **Privacy-Preserving Analytics**: Generate insights without compromising individual data points
 
-- **Product Origins**: Manufacturers can register products with encrypted authenticity markers
-- **Supply Chain Privacy**: Each step in the product journey remains confidential
-- **Verification Without Exposure**: Consumers and retailers can verify authenticity without accessing sensitive manufacturing data
-- **Immutable Records**: All transactions are permanently recorded on blockchain while maintaining privacy
+### Privacy Product Traceability - Confidential Tracking System
+The core innovation lies in creating a **confidential tracking system** that provides:
 
-## 🌐 Live Application
+#### 🏭 **Encrypted Manufacturing Data**
+- Manufacturer IDs encrypted using FHE
+- Production timestamps protected while maintaining verifiability
+- Quality scores kept confidential yet verifiable
+- Cost information secured from competitors
 
-**Website**: [https://privacy-traceability.vercel.app/](https://privacy-traceability.vercel.app/)
+#### 📦 **Confidential Batch Management**
+- Supplier count information encrypted
+- Batch creation timestamps protected
+- Quantity data secured while maintaining supply chain integrity
+- Sealed batch verification without data exposure
 
-**GitHub Repository**: [https://github.com/FreidaFarrell/PrivacyTraceability](https://github.com/FreidaFarrell/PrivacyTraceability)
+#### 🔍 **Private Traceability Records**
+- Location IDs encrypted to protect facility information
+- Handler identification secured
+- Quality check results kept confidential
+- Event types publicly visible for transparency while protecting sensitive details
 
-## 📋 Smart Contract
+## 🛠 Technical Architecture
 
-**Contract Address**: `0x636449ad5E280e88BB7178985259c91628472c5f`
+### Smart Contract Features
+- **Contract Address**: `0xD2BF97b3D170fde0ef4c20249D31A88F9FA915AC`
+- Built on **Zama's FHE protocol** for Ethereum
+- Implements **euint32**, **euint64**, and **ebool** encrypted types
+- Uses **@fhevm/solidity** library for FHE operations
+- Supports **SepoliaConfig** for testnet deployment
 
-The smart contract implements advanced FHE encryption protocols to secure product authenticity data while enabling computational verification operations.
+### Frontend Technology
+- **Zero Dependencies**: Pure HTML5, CSS3, and JavaScript
+- **Web3 Integration**: Direct blockchain interaction via MetaMask
+- **Responsive Design**: Mobile-first approach for all devices
+- **Real-time Updates**: Live blockchain data synchronization
+- **CDN Integration**: Optimized loading with jsDelivr CDN
 
-## 🎥 Demo Video
+## 🎯 Key Features
 
-Watch our comprehensive demonstration showcasing the privacy-preserving product traceability workflow, including product registration, encrypted verification, and supply chain management.
+### 🔐 **Privacy-First Design**
+- All sensitive data encrypted using FHE
+- Public verification without data exposure
+- Confidential computations on encrypted data
+- Zero-knowledge proof capabilities
 
-## ✨ Key Features
+### 🏭 **Manufacturer Panel**
+- Secure batch creation with encrypted parameters
+- Confidential product registration
+- Private quality score tracking
+- Batch sealing for supply chain integrity
 
-### 🔒 Privacy-First Architecture
-- **Encrypted Authenticity**: Product legitimacy data encrypted using FHE
-- **Confidential Verification**: Verify products without exposing sensitive details
-- **Zero-Knowledge Operations**: Computational proofs without data revelation
+### 📋 **Tracker Panel**
+- Encrypted location and handler tracking
+- Confidential quality check recording
+- Private event logging with public event types
+- Secure trace record management
 
-### 🏭 Manufacturer Management
-- **Authorization Control**: Role-based access for certified manufacturers
-- **Product Registration**: Secure addition of products to the traceability network
-- **Supply Chain Integration**: Seamless connection with existing manufacturing systems
+### 🔍 **Query & Verification System**
+- Product information retrieval
+- Batch status verification
+- Complete trace history access
+- Authenticity verification without data exposure
+- System-wide statistics and analytics
 
-### 🔍 Advanced Verification
-- **Instant Authentication**: Real-time product verification capabilities
-- **Batch Processing**: Efficient verification of multiple products simultaneously
-- **Historical Tracking**: Complete audit trail of all product interactions
+### 📊 **Real-time Dashboard**
+- Live product and batch counters
+- Authorization status monitoring
+- Network information display
+- Transaction status tracking
 
-### 🛡️ Security & Governance
-- **Contract Pause Mechanism**: Emergency controls for system security
-- **Ownership Transfer**: Secure administrative control transitions
-- **Access Management**: Granular permission system for stakeholders
+## 🎬 Demo Content
 
-## 🚀 Technology Stack
+### 📹 **Demonstration Video**
+The repository includes a comprehensive demo video showcasing:
+- Complete system walkthrough
+- Privacy features demonstration
+- FHE encryption in action
+- Real blockchain interactions
+- User interface tour
 
-- **Blockchain**: Ethereum with Solidity smart contracts
-- **Encryption**: Fully Homomorphic Encryption (FHE) protocols
-- **Frontend**: Modern web interface with Web3 integration
-- **Wallet Integration**: MetaMask and other Web3 wallet support
+### 📸 **Transaction Screenshots**
+Visual documentation includes:
+- Successful contract deployments
+- Encrypted data transactions
+- Authorization processes
+- Query operations
+- Verification results
 
-## 🌍 Use Cases
+## 🔒 Security & Privacy
 
-### Pharmaceutical Industry
-Ensure medication authenticity while protecting proprietary formulation data and manufacturing processes.
+### Encryption Standards
+- **Fully Homomorphic Encryption**: State-of-the-art privacy protection
+- **Zama Protocol**: Industry-leading FHE implementation
+- **On-chain Privacy**: Encrypted storage with public verifiability
+- **Access Control**: Role-based authorization system
 
-### Luxury Goods
-Verify designer product legitimacy without exposing sensitive brand protection mechanisms.
+### Data Protection
+- Manufacturer data: **Fully Encrypted**
+- Production details: **Confidentially Stored**
+- Supply chain info: **Privacy-Preserved**
+- Quality metrics: **Securely Protected**
 
-### Food & Agriculture
-Track organic certification and origin verification while maintaining trade secret protection.
+### Authorization System
+- **Owner-based Control**: Contract owner manages authorizations
+- **Role-based Access**: Separate manufacturer and tracker roles
+- **Granular Permissions**: Function-level access control
+- **Secure Operations**: Protected administrative functions
 
-### Electronics & Technology
-Authenticate components and devices while preserving intellectual property and manufacturing details.
+## 🌐 Network Information
 
-## 🔬 Technical Innovation
+- **Blockchain**: Ethereum Sepolia Testnet
+- **FHE Protocol**: Zama Network Integration
+- **Web3 Provider**: MetaMask Compatible
+- **Storage**: On-chain Encrypted Data
+- **Verification**: Blockchain-based Authenticity
 
-Our system represents a significant advancement in blockchain privacy technology by combining:
+## 🚀 Use Cases
 
-- **Cryptographic Innovation**: State-of-the-art FHE implementation
-- **Practical Application**: Real-world supply chain integration
-- **User Experience**: Intuitive interface for complex cryptographic operations
-- **Scalability**: Efficient protocols for enterprise-level deployment
+### Supply Chain Management
+- **Pharmaceutical Tracking**: Confidential drug supply chains
+- **Food Safety**: Private ingredient and process tracking
+- **Electronics Manufacturing**: Secure component traceability
+- **Automotive Industry**: Confidential parts tracking
+- **Luxury Goods**: Anti-counterfeiting with privacy
 
-## 📊 Benefits
+### Enterprise Solutions
+- **Corporate Supply Chains**: Internal process privacy
+- **B2B Transactions**: Confidential business relationships
+- **Quality Assurance**: Private testing and certification
+- **Regulatory Compliance**: Auditable yet private records
+- **Intellectual Property**: Protected manufacturing processes
 
-### For Manufacturers
-- Protect sensitive production data while proving authenticity
-- Maintain competitive advantages through confidential processes
-- Build consumer trust through verifiable yet private credentials
+## 🌟 Innovation Highlights
 
-### For Consumers
-- Verify product authenticity with confidence
-- Access supply chain information without compromising privacy
-- Make informed purchasing decisions based on cryptographic proof
+### Technical Breakthroughs
+- First production-ready FHE traceability system
+- Zero-knowledge supply chain verification
+- Confidential multi-party computations
+- Privacy-preserving analytics platform
 
-### For Retailers
-- Authenticate inventory without accessing proprietary information
-- Streamline verification processes across multiple product lines
-- Reduce counterfeit risks through blockchain-based verification
+### Business Impact
+- **Cost Reduction**: Eliminate intermediary trust requirements
+- **Privacy Protection**: Secure sensitive business data
+- **Regulatory Compliance**: Meet privacy regulations automatically
+- **Competitive Advantage**: Protect proprietary processes
+- **Trust Building**: Verifiable yet private operations
+
+## 📞 Support & Community
+
+For questions, feature requests, or technical support, please visit our GitHub repository or reach out through the project's communication channels.
 
 ---
 
-*Privacy Traceability System - Revolutionizing supply chain transparency through cryptographic innovation.*
+*Privacy Traceability System - Revolutionizing supply chain transparency through confidential blockchain technology.*
